@@ -20,7 +20,7 @@ SWEET2_IMAGE = pygame.transform.scale(
     pygame.image.load("candy2.png"), (SWEET_WIDTH, SWEET_HEIGHT)
 )
 POISON_IMAGE = pygame.transform.scale(
-    pygame.image.load("poison.png"), (SWEET_WIDTH, SWEET_HEIGHT)
+    pygame.image.load("poisonn.png"), (PLAYER_WIDTH, PLAYER_HEIGHT)
 )
 SPEED_IMAGE = pygame.transform.scale(
     pygame.image.load("speed_candy.png"), (SWEET_WIDTH, SWEET_HEIGHT)
@@ -59,7 +59,7 @@ class Player(Sprite):
     def move(self, pressed):
         if pressed[pygame.K_a] and self.rect.x > 0:
             self.change_coordinates(x=-self.speed)
-        if pressed[pygame.K_d] and self.rect.x < WIDTH - self.width:
+        if pressed[pygame.K_d] and self.rect.x < 800:
             self.change_coordinates(x=self.speed)
 
     def fall(self):
@@ -85,7 +85,7 @@ class Game:
             Sweet(SWEET_WIDTH, SWEET_HEIGHT, (20, 100), 3, POISON_IMAGE),
             Sweet(SWEET_WIDTH, SWEET_HEIGHT, (200, 10), 3, SPEED_IMAGE)
         ]
-        self.poison = Sweet(SWEET_WIDTH, SWEET_HEIGHT, (200, 10), 3, POISON_IMAGE)
+        self.poison = Sweet(PLAYER_WIDTH, PLAYER_HEIGHT, (200, 10), 3, POISON_IMAGE)
         self.candspeed = Sweet(SWEET_WIDTH, SWEET_HEIGHT, (200, 10), 3, SPEED_IMAGE)
         self.hearts = 5
         pygame.display.set_caption("Sweets")
@@ -103,10 +103,16 @@ class Game:
                 self.sweets.append(
                     Sweet(SWEET_WIDTH, SWEET_HEIGHT, (random.randint(0, WIDTH - SWEET_WIDTH), 0), 3, SWEET2_IMAGE))
             if random.randint(0, 1000) == 1:
-                self.poison = Sweet(SWEET_WIDTH, SWEET_HEIGHT, (random.randint(0, WIDTH - SWEET_WIDTH), -50), 3, POISON_IMAGE)
+                self.poison = Sweet(PLAYER_WIDTH, PLAYER_HEIGHT, (random.randint(0, WIDTH - SWEET_WIDTH), -50), 3, POISON_IMAGE)
                 self.candspeed = Sweet(SWEET_WIDTH, SWEET_HEIGHT, (random.randint(0, WIDTH - SWEET_WIDTH), -50), 3, SPEED_IMAGE)
 
                 self.sweets += [self.poison, self.candspeed]
+
+            if self.player.get_coordinates()[0] > 800:
+                self.player.set_coordinates(700, self.player.get_coordinates()[1])
+
+            if self.player.get_coordinates()[0] < 0:
+                self.player.set_coordinates(100, self.player.get_coordinates()[1])
 
             self.screen.blit(BACKGROUND_IMAGE, (0, 0))
             for i in range(self.hearts):
@@ -115,9 +121,9 @@ class Game:
             self.player.move(pygame.key.get_pressed())
             self.screen.blit(PLAYER_IMAGE, self.player.get_coordinates())
 
-            if self.player.rect.colliderect(self.poison.rect):
+            if self.player.rect.colliderect(self.poison.rect) and self.player.speed > 1:
                 self.player.speed -= 1
-            if self.player.rect.colliderect(self.candspeed.rect):
+            if self.player.rect.colliderect(self.candspeed.rect) and self.player.speed < 10:
                 self.player.speed += 1
 
 
